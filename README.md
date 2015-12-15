@@ -2,7 +2,7 @@ api-example-scala-client
 =============
 [![Build Status](https://travis-ci.org/hmrc/api-example-scala-client.svg)](https://travis-ci.org/hmrc/api-example-scala-client) [ ![Download](https://api.bintray.com/packages/hmrc/releases/api-example-scala-client/images/download.svg) ](https://bintray.com/hmrc/releases/api-example-scala-client/_latestVersion)
 
-*api-example-scala-client* is a simple scala application that provides a reference implementation of a HMRC client application.
+*api-example-scala-client* is a sample scala application that provides a reference implementation of a HMRC client application.
 
 It accesses three endpoints, each with their own authorisation requirements:
 
