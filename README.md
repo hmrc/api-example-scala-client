@@ -14,6 +14,8 @@ The implementation of the Hello User flow requests an OAuth 2.0 token and subseq
 
 The parameters clientId, clientSecret and serverToken will need to be updated in [`conf/application.conf`](conf/application.conf)
 
+You will need to add the redirect URI 'http://localhost:9000' to your application.
+
 API documentation is available at https://developer.service.hmrc.gov.uk/api-documentation
 
 Application developers need to register with the platform and will be provided with key, secret and tokens upon registration.
@@ -26,7 +28,7 @@ sbt run
 Once running, the application will be available at:
 
 ```
-http://localhost:9000/
+http://localhost:9000/hello
 ```
 
 ### License
