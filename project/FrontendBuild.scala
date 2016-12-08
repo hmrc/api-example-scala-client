@@ -1,7 +1,8 @@
 import sbt._
 import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
+import uk.gov.hmrc.versioning.SbtGitVersioning
+
 object FrontendBuild extends Build with MicroService {
 
   val appName = "api-example-scala-client"
@@ -14,26 +15,21 @@ object FrontendBuild extends Build with MicroService {
 }
 
 private object AppDependencies {
-  import play.PlayImport._
 
-  private val hmrcPlayJsonLoggerVersion = "2.1.1"
-  private val scalaTestVersion = "2.2.5"
-  private val scalaTestPlusVersion = "1.2.0"
-  private val pegdownVersion = "1.6.0"
+  import play.sbt.PlayImport._
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "play-json-logger" % hmrcPlayJsonLoggerVersion
+    "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0"
   )
 
   val test = Seq(
     ws,
-    "org.scalatest" %% "scalatest" % scalaTestVersion % "test,it",
-    "org.scalatestplus" %% "play" % scalaTestPlusVersion %  "test,it",
-    "org.pegdown" % "pegdown" % pegdownVersion % "test,it"
+    "org.scalatest" %% "scalatest" % "2.2.5" % "test,it",
+    "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % "test,it",
+    "org.mockito" % "mockito-core" % "1.9.0" % "test,it",
+    "org.pegdown" % "pegdown" % "1.6.0" % "test,it"
   )
 
   def apply() = compile ++ test
 }
-
-
