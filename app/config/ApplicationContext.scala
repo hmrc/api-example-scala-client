@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import play.api.Play
 
 trait ApplicationContext {
 
+  val appName = getConfigString("appName")
   val callbackUrl = s"${getConfigString("callbackUrl")}/hello/hello-world/oauth20/callback"
   val clientId = getConfigString("clientId")
   val clientSecret = getConfigString("clientSecret")

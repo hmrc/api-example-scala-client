@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,18 @@ trait HelloUserService {
     val oauthConnector: OAuth20Connector
 
     def helloOauth(oAuthToken: String, refreshToken: String): Future[(JsValue, OauthTokens)] = {
-        apiConnector.helloUser(oAuthToken).map((_, new OauthTokens(oAuthToken,refreshToken))) recoverWith {
-          case e:UnauthorizedException =>
-            oauthConnector.refreshToken(refreshToken) flatMap (t => apiConnector.helloUser(t.access_token) map ((
-              _,
-              OauthTokens(t.access_token,t.refresh_token))))
+        apiConnector.helloUser(oAuthToken).map((_, OauthTokens(oAuthToken,refreshToken))) recoverWith {
+          case e: UnauthorizedException =>
+            oauthConnector.refreshToken(refreshToken) flatMap { t =>
+              apiConnector.helloUser(t.access_token) map ((_, OauthTokens(t.access_token, t.refresh_token)))
+            }
         }
     }
 
     def helloOauth(authorizationCode: String): Future[(JsValue, OauthTokens)] = {
-      oauthConnector.getToken(authorizationCode) flatMap(t => apiConnector.helloUser(t.access_token) map ((
-        _,
-        OauthTokens(t.access_token,t.refresh_token))))
+      oauthConnector.getToken(authorizationCode) flatMap { t =>
+        apiConnector.helloUser(t.access_token) map ((_, OauthTokens(t.access_token,t.refresh_token)))
+      }
     }
 }
 

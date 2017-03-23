@@ -31,6 +31,11 @@ Once running, the application will be available at:
 http://localhost:9000/hello
 ```
 
+The unit tests can be run with the following command:
+```
+sbt test
+```
+
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
