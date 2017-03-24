@@ -25,7 +25,7 @@ trait ApplicationContext {
   val callbackUrl = s"${getConfigString("callbackUrl")}/hello/hello-world/oauth20/callback"
   val clientId = getConfigString("clientId")
   val clientSecret = getConfigString("clientSecret")
-  val accessToken = getConfigString("accessToken")
+  val serverToken = getConfigString("serverToken")
   val oauth = getConfigString(s"services.oauth")
   val apiGateway = getConfigString("services.api-gateway")
   val authorizeUrl = s"$oauth/oauth/authorize"

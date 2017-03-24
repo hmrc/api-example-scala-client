@@ -26,23 +26,23 @@ case class OauthTokens(access_token: String, refresh_token: String)
 
 trait HelloUserService {
 
-    val apiConnector: ApiConnector
-    val oauthConnector: OAuth20Connector
+  val apiConnector: ApiConnector
+  val oauthConnector: OAuth20Connector
 
-    def helloOauth(oAuthToken: String, refreshToken: String): Future[(JsValue, OauthTokens)] = {
-        apiConnector.helloUser(oAuthToken).map((_, OauthTokens(oAuthToken,refreshToken))) recoverWith {
-          case e: UnauthorizedException =>
-            oauthConnector.refreshToken(refreshToken) flatMap { t =>
-              apiConnector.helloUser(t.access_token) map ((_, OauthTokens(t.access_token, t.refresh_token)))
-            }
+  def helloOauth(oAuthToken: String, refreshToken: String): Future[(JsValue, OauthTokens)] = {
+    apiConnector.helloUser(oAuthToken).map((_, OauthTokens(oAuthToken,refreshToken))) recoverWith {
+      case e: UnauthorizedException =>
+        oauthConnector.refreshToken(refreshToken) flatMap { t =>
+          apiConnector.helloUser(t.access_token) map ((_, OauthTokens(t.access_token, t.refresh_token)))
         }
     }
+  }
 
-    def helloOauth(authorizationCode: String): Future[(JsValue, OauthTokens)] = {
-      oauthConnector.getToken(authorizationCode) flatMap { t =>
-        apiConnector.helloUser(t.access_token) map ((_, OauthTokens(t.access_token,t.refresh_token)))
-      }
+  def helloOauth(authorizationCode: String): Future[(JsValue, OauthTokens)] = {
+    oauthConnector.getToken(authorizationCode) flatMap { t =>
+      apiConnector.helloUser(t.access_token) map ((_, OauthTokens(t.access_token, t.refresh_token)))
     }
+  }
 }
 
 object HelloUserService extends HelloUserService {

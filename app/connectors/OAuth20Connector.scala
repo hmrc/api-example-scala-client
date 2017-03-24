@@ -16,6 +16,8 @@
 
 package connectors
 
+import java.util.UUID
+
 import config.ApplicationContext
 import play.api.Play.current
 import play.api.libs.json.{JsValue, Json}
@@ -54,17 +56,19 @@ trait OAuth20Connector {
   )
 
   private def oauth2(body: Map[String, Seq[String]]): Future[OauthResponse] = {
-    val requestToken = WS.url(tokenUrl)
-      .withHeaders(
-        "Csrf-Token" -> "nocheck",
-        "User-Agent" -> ApplicationContext.appName)
-      .post(
-        Map(
-          "client_id" -> Seq(clientId),
-          "client_secret" -> Seq(clientSecret)
-        ) ++ body)
+    val request = WS.url(tokenUrl).withHeaders(
+      "Csrf-Token" -> "nocheck",
+      "User-Agent" -> ApplicationContext.appName,
+      "X-Request-ID" -> s"govuk-tax-${UUID.randomUUID().toString}"
+    )
 
-    extractJson[OauthResponse](requestToken, { json: JsValue => json.validate[OauthResponse] })
+    val response = request.post(
+      Map(
+        "client_id" -> Seq(clientId),
+        "client_secret" -> Seq(clientSecret)
+      ) ++ body)
+
+    extractJson[OauthResponse](response, { json: JsValue => json.validate[OauthResponse] })
   }
 
 }

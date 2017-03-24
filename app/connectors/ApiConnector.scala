@@ -16,6 +16,8 @@
 
 package connectors
 
+import java.util.UUID
+
 import config.ApplicationContext
 import play.api.libs.json.JsValue
 import play.api.Play.current
@@ -35,18 +37,24 @@ trait ApiConnector {
   def helloApplication(): Future[JsValue] = api("/hello/application", Some(appToken))
 
   private def api(endpoint: String, token: Option[String] = None): Future[JsValue] = {
-    val headers: Seq[(String, String)] = token match {
-      case Some(t) => Seq("Authorization" -> s"Bearer $t", "Accept" -> versionHeader)
-      case None => Seq("Accept" -> versionHeader)
+    val authorizationHeaders: Seq[(String, String)] = token match {
+      case Some(t) => Seq("Authorization" -> s"Bearer $t")
+      case None => Seq()
     }
-    extractJson[JsValue](
-      WS.url(s"$serviceUrl$endpoint").withHeaders(headers:_*).get()
+    val headers = authorizationHeaders ++ Seq(
+      "Accept" -> versionHeader,
+      "User-Agent" -> ApplicationContext.appName,
+      "X-Request-ID" -> s"govuk-tax-${UUID.randomUUID().toString}"
     )
+
+    val request = WS.url(s"$serviceUrl$endpoint").withHeaders(headers:_*)
+
+    extractJson[JsValue](request.get())
   }
 
 }
 
 object ApiConnector extends ApiConnector {
   override lazy val serviceUrl = ApplicationContext.apiGateway
-  override lazy val appToken: String = ApplicationContext.accessToken
+  override lazy val appToken: String = ApplicationContext.serverToken
 }
