@@ -21,7 +21,6 @@ import play.api.Play
 
 trait ApplicationContext {
 
-  val appName = getConfigString("appName")
   val callbackUrl = s"${getConfigString("callbackUrl")}/hello/hello-world/oauth20/callback"
   val clientId = getConfigString("clientId")
   val clientSecret = getConfigString("clientSecret")

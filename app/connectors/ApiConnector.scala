@@ -16,11 +16,10 @@
 
 package connectors
 
-import java.util.UUID
-
 import config.ApplicationContext
 import play.api.libs.json.JsValue
 import play.api.Play.current
+import play.api.http.HeaderNames
 import play.api.libs.ws.WS
 
 import scala.concurrent.Future
@@ -37,14 +36,12 @@ trait ApiConnector {
   def helloApplication(): Future[JsValue] = api("/hello/application", Some(appToken))
 
   private def api(endpoint: String, token: Option[String] = None): Future[JsValue] = {
-    val authorizationHeaders: Seq[(String, String)] = token match {
-      case Some(t) => Seq("Authorization" -> s"Bearer $t")
+    val authorizationHeader: Seq[(String, String)] = token match {
+      case Some(t) => Seq(HeaderNames.AUTHORIZATION -> s"Bearer $t")
       case None => Seq()
     }
-    val headers = authorizationHeaders ++ Seq(
-      "Accept" -> versionHeader,
-      "User-Agent" -> ApplicationContext.appName,
-      "X-Request-ID" -> s"govuk-tax-${UUID.randomUUID().toString}"
+    val headers = authorizationHeader ++ Seq(
+      HeaderNames.ACCEPT -> versionHeader
     )
 
     val request = WS.url(s"$serviceUrl$endpoint").withHeaders(headers:_*)

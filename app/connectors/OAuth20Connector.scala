@@ -16,8 +16,6 @@
 
 package connectors
 
-import java.util.UUID
-
 import config.ApplicationContext
 import play.api.Play.current
 import play.api.libs.json.{JsValue, Json}
@@ -57,9 +55,7 @@ trait OAuth20Connector {
 
   private def oauth2(body: Map[String, Seq[String]]): Future[OauthResponse] = {
     val request = WS.url(tokenUrl).withHeaders(
-      "Csrf-Token" -> "nocheck",
-      "User-Agent" -> ApplicationContext.appName,
-      "X-Request-ID" -> s"govuk-tax-${UUID.randomUUID().toString}"
+      "Csrf-Token" -> "nocheck"
     )
 
     val response = request.post(
