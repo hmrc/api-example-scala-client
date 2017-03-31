@@ -54,9 +54,7 @@ trait OAuth20Connector {
   )
 
   private def oauth2(body: Map[String, Seq[String]]): Future[OauthResponse] = {
-    val request = WS.url(tokenUrl).withHeaders(
-      "Csrf-Token" -> "nocheck"
-    )
+    val request = WS.url(tokenUrl)
 
     val response = request.post(
       Map(
