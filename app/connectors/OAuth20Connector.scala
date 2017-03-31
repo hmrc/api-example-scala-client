@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WS
 
 import scala.concurrent.Future
-
 
 case class OauthResponse(access_token: String, refresh_token: String, expires_in: Long)
 
@@ -55,14 +54,15 @@ trait OAuth20Connector {
   )
 
   private def oauth2(body: Map[String, Seq[String]]): Future[OauthResponse] = {
-    val requestToken = WS.url(tokenUrl).withHeaders("Csrf-Token" -> "nocheck").
-      post(
-        Map(
-          "client_id" -> Seq(clientId),
-          "client_secret" -> Seq(clientSecret)
-        ) ++ body)
+    val request = WS.url(tokenUrl)
 
-    extractJson[OauthResponse](requestToken, { json: JsValue => json.validate[OauthResponse] })
+    val response = request.post(
+      Map(
+        "client_id" -> Seq(clientId),
+        "client_secret" -> Seq(clientSecret)
+      ) ++ body)
+
+    extractJson[OauthResponse](response, { json: JsValue => json.validate[OauthResponse] })
   }
 
 }

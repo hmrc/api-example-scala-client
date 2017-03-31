@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package connectors
 import config.ApplicationContext
 import play.api.libs.json.JsValue
 import play.api.Play.current
+import play.api.http.HeaderNames
 import play.api.libs.ws.WS
 
 import scala.concurrent.Future
@@ -35,18 +36,22 @@ trait ApiConnector {
   def helloApplication(): Future[JsValue] = api("/hello/application", Some(appToken))
 
   private def api(endpoint: String, token: Option[String] = None): Future[JsValue] = {
-    val headers: Seq[(String, String)] = token match {
-      case Some(t) => Seq("Authorization" -> s"Bearer $t", "Accept" -> versionHeader)
-      case None => Seq("Accept" -> versionHeader)
+    val authorizationHeader: Seq[(String, String)] = token match {
+      case Some(t) => Seq(HeaderNames.AUTHORIZATION -> s"Bearer $t")
+      case None => Seq()
     }
-    extractJson[JsValue](
-      WS.url(s"$serviceUrl$endpoint").withHeaders(headers:_*).get()
+    val headers = authorizationHeader ++ Seq(
+      HeaderNames.ACCEPT -> versionHeader
     )
+
+    val request = WS.url(s"$serviceUrl$endpoint").withHeaders(headers:_*)
+
+    extractJson[JsValue](request.get())
   }
 
 }
 
 object ApiConnector extends ApiConnector {
   override lazy val serviceUrl = ApplicationContext.apiGateway
-  override lazy val appToken: String = ApplicationContext.accessToken
+  override lazy val appToken: String = ApplicationContext.serverToken
 }
