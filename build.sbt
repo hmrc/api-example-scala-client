@@ -9,6 +9,9 @@ lazy val playSettings: Seq[Setting[_]] = Seq.empty
 
 lazy val microservice = (project in file("."))
   .enablePlugins(Seq(play.sbt.PlayScala) ++ plugins: _*)
+  .settings(
+    name := appName
+  )
   .settings(playSettings: _*)
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
@@ -42,7 +45,7 @@ lazy val microservice = (project in file("."))
   .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
   .settings(scalaVersion := "2.11.11")
 
-val appName = "api-example-scala-client"
+lazy val appName = "api-example-scala-client"
 lazy val appDependencies: Seq[ModuleID] = allDeps
 
 val compile = Seq(
