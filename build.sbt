@@ -3,7 +3,7 @@ import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, s
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 lazy val plugins: Seq[Plugins] = Seq(
-  SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin
+  SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory
 )
 lazy val playSettings: Seq[Setting[_]] = Seq.empty
 
