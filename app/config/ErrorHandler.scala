@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package config
 
-import connectors.ApiConnector
 import javax.inject.Inject
-import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import play.api.Configuration
+import play.api.i18n.MessagesApi
+import play.api.mvc.Request
+import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
 
-import scala.concurrent.ExecutionContext.Implicits.global
+class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration) extends FrontendErrorHandler {
 
-class HelloWorld @Inject()(apiConnector: ApiConnector) extends BaseController {
-
-  def hello = Action.async { implicit request =>
-    apiConnector.helloWorld() map (Ok(_))
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]) = {
+    views.html.global_error(pageTitle, heading, message)
   }
-
 }

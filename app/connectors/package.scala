@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import connectors.UnauthorizedException
 import play.Logger
 import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue}
 import play.api.libs.ws.WSResponse

@@ -19,12 +19,13 @@ package controllers
 import connectors.ApiConnector
 import javax.inject.Inject
 import play.api.mvc._
+import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class HelloApplication @Inject()(apiConnector: ApiConnector) extends Controller {
+class HelloApplication @Inject()(apiConnector: ApiConnector) extends BaseController {
 
-  def hello = Action.async {
+  def hello = Action.async { implicit request =>
     apiConnector.helloApplication() map (Ok(_))
   }
 }

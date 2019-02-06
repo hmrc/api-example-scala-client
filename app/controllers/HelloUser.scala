@@ -19,12 +19,13 @@ package controllers
 import javax.inject.Inject
 import play.api.mvc._
 import services.{HelloUserService, OauthTokens}
+import uk.gov.hmrc.play.bootstrap.controller.{BaseController, FrontendController}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class HelloUser @Inject()(service: HelloUserService, config: HelloUserConfig) extends Controller {
+class HelloUser @Inject()(service: HelloUserService, config: HelloUserConfig) extends BaseController {
 
   implicit class RequestBuilder(result: Result)(implicit request: play.api.mvc.RequestHeader) {
     def addToken(oauthTokens: OauthTokens) =

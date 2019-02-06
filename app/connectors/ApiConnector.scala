@@ -17,23 +17,29 @@
 package connectors
 
 import javax.inject.Inject
-import play.api.Play.current
 import play.api.http.HeaderNames
 import play.api.libs.json.JsValue
-import play.api.libs.ws.WS
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class ApiConnector @Inject()(config: ApiConfig) {
+class ApiConnector @Inject()(config: ApiConfig, httpClient: HttpClient)(implicit ex: ExecutionContext) {
   val versionHeader = "application/vnd.hmrc.1.0+json"
 
-  def helloWorld(): Future[JsValue] = api("/hello/world")
+  def helloWorld()(implicit hc: HeaderCarrier): Future[JsValue] = {
+    api("/hello/world")(buildHeaderCarrier())
+  }
 
-  def helloUser(oauthToken: String): Future[JsValue] = api("/hello/user", Some(oauthToken))
+  def helloUser(oauthToken: String)(implicit hc: HeaderCarrier): Future[JsValue] = {
+    api("/hello/user")(buildHeaderCarrier(Some(oauthToken)))
+  }
 
-  def helloApplication(): Future[JsValue] = api("/hello/application", Some(config.serverToken))
+  def helloApplication()(implicit hc: HeaderCarrier): Future[JsValue] = {
+    api("/hello/application")(buildHeaderCarrier(Some(config.serverToken)))
+  }
 
-  private def api(endpoint: String, token: Option[String] = None): Future[JsValue] = {
+  private def buildHeaderCarrier(token: Option[String] = None)(implicit hc: HeaderCarrier) : HeaderCarrier = {
     val authorizationHeader: Seq[(String, String)] = token match {
       case Some(t) => Seq(HeaderNames.AUTHORIZATION -> s"Bearer $t")
       case None => Seq()
@@ -41,10 +47,11 @@ class ApiConnector @Inject()(config: ApiConfig) {
     val headers = authorizationHeader ++ Seq(
       HeaderNames.ACCEPT -> versionHeader
     )
+    hc.withExtraHeaders(headers: _*)
+  }
 
-    val request = WS.url(s"${config.apiGateway}$endpoint").withHeaders(headers: _*)
-
-    extractJson[JsValue](request.get())
+  private def api(endpoint: String )(implicit hc: HeaderCarrier): Future[JsValue] = {
+    httpClient.GET[JsValue](s"${config.apiGateway}$endpoint")
   }
 
 }
