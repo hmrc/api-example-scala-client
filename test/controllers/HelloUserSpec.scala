@@ -19,7 +19,7 @@ package controllers
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneAppPerTest, PlaySpec}
 import play.api.libs.json.Json
 import play.api.mvc.Result
@@ -32,23 +32,20 @@ import scala.concurrent.Future
 class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with OneAppPerTest {
 
   trait Setup {
-    val controller = new HelloUser {
-      override val service: HelloUserService = mock[HelloUserService]
-      override val clientId: String = "CLIENT_ID"
-      override val authorizeUrl: String = "http://authorizeurl.org"
-      override val callbackUrl: String = "http://helloworld.org"
-    }
+    val config = HelloUserConfig("CLIENT_ID", "http://helloworld.org", "http://authorizeurl.org")
+    val mockHelloUserService = mock[HelloUserService]
+    val controller = new HelloUser(mockHelloUserService, config)
   }
 
   "HelloUser callback" should {
     "return 200 with a json when authorization code is provided" in new Setup {
       val authorizationCode = "11111111"
       val token = OauthTokens("023456789", "9876543442")
-      when(controller.service.helloOauth(authorizationCode)).thenReturn(
+      when(mockHelloUserService.helloOauth(authorizationCode)).thenReturn(
         Future.successful((Json.parse( """{"message":"hello User"}"""), token))
       )
       val result = controller.helloWithCallback(Some(authorizationCode), None).apply(FakeRequest())
-      verify(controller.service).helloOauth(authorizationCode)
+      verify(mockHelloUserService).helloOauth(authorizationCode)
 
       status(result) mustBe 200
       session(result).get("token").get mustBe token.access_token
@@ -77,7 +74,7 @@ class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with Mo
     "return internal server eror when service fails" in new Setup {
       val authorizationCode = "11111111"
       val token = OauthTokens("023456789", "9876543442")
-      when(controller.service.helloOauth(authorizationCode)).thenReturn(
+      when(mockHelloUserService.helloOauth(authorizationCode)).thenReturn(
         Future.failed(new RuntimeException("exception"))
       )
       val result = controller.helloWithCallback(Some(authorizationCode), None).apply(FakeRequest())
@@ -91,14 +88,15 @@ class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with Mo
     "redirect to the oauth frontend when there is no token in the session" in new Setup {
       val result = controller.hello().apply(FakeRequest())
       status(result) mustBe 303
-      headers(result).get("location").get mustBe "http://authorizeurl.org?client_id=CLIENT_ID&scope=hello&response_type=code&redirect_uri=http%3A%2F%2Fhelloworld.org"
+      headers(result).get("location").get mustBe
+        "http://authorizeurl.org?client_id=CLIENT_ID&scope=hello&response_type=code&redirect_uri=http%3A%2F%2Fhelloworld.org"
     }
 
     "return 200 with a json when there is a valid access token and refresh token in the session" in new Setup {
       val accessToken = "023456789"
       val refreshToken = "9876543442"
       val oldToken = OauthTokens(accessToken, refreshToken)
-      when(controller.service.helloOauth(accessToken, refreshToken)).thenReturn(
+      when(mockHelloUserService.helloOauth(accessToken, refreshToken)).thenReturn(
         Future.successful((Json.parse( """{"message":"hello User"}"""), oldToken))
       )
 
@@ -108,7 +106,7 @@ class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with Mo
       )
 
       val result: Future[Result] = controller.hello().apply(req)
-      verify(controller.service).helloOauth(accessToken, refreshToken)
+      verify(mockHelloUserService).helloOauth(accessToken, refreshToken)
       status(result) mustBe 200
       session(result).get("token").get mustBe oldToken.access_token
       session(result).get("refresh_token").get mustBe oldToken.refresh_token
@@ -120,7 +118,7 @@ class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with Mo
       val accessToken = "023456789"
       val refreshToken = "9876543442"
       val newToken = OauthTokens("111111111", "222222222")
-      when(controller.service.helloOauth(accessToken, refreshToken)).thenReturn(
+      when(mockHelloUserService.helloOauth(accessToken, refreshToken)).thenReturn(
         Future.successful((Json.parse( """{"message":"hello User"}"""), newToken))
       )
 
@@ -130,7 +128,7 @@ class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with Mo
       )
 
       val result: Future[Result] = controller.hello().apply(req)
-      verify(controller.service).helloOauth(accessToken, refreshToken)
+      verify(mockHelloUserService).helloOauth(accessToken, refreshToken)
       status(result) mustBe 200
       session(result).get("token").get mustBe newToken.access_token
       session(result).get("refresh_token").get mustBe newToken.refresh_token
@@ -141,7 +139,7 @@ class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with Mo
     "return 500 when service fails" in new Setup {
       val accessToken = "023456789"
       val refreshToken = "9876543442"
-      when(controller.service.helloOauth(accessToken, refreshToken)).thenReturn(
+      when(mockHelloUserService.helloOauth(accessToken, refreshToken)).thenReturn(
         Future.failed(new RuntimeException("exception"))
       )
       val req = FakeRequest().withSession(
@@ -149,7 +147,7 @@ class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with Mo
         "refresh_token" -> refreshToken
       )
       val result: Future[Result] = controller.hello().apply(req)
-      verify(controller.service).helloOauth(accessToken, refreshToken)
+      verify(mockHelloUserService).helloOauth(accessToken, refreshToken)
       status(result) mustBe 500
       contentAsString(result) mustBe "exception"
     }

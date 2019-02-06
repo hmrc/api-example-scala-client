@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.ApplicationContext
+import javax.inject.Inject
 import play.api.mvc._
 import services.{HelloUserService, OauthTokens}
 
@@ -24,11 +24,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-trait HelloUser extends Controller {
-  val service: HelloUserService
-  val clientId: String
-  val callbackUrl: String
-  val authorizeUrl: String
+class HelloUser @Inject()(service: HelloUserService, config: HelloUserConfig) extends Controller {
 
   implicit class RequestBuilder(result: Result)(implicit request: play.api.mvc.RequestHeader) {
     def addToken(oauthTokens: OauthTokens) =
@@ -42,12 +38,12 @@ trait HelloUser extends Controller {
 
     def redirectToOauthFrontEnd = Future.successful(
       Redirect(
-        s"$authorizeUrl",
+        s"${config.authorizeUrl}",
         Map(
-          "client_id" -> Seq(clientId),
+          "client_id" -> Seq(config.clientId),
           "scope" -> Seq("hello"),
           "response_type" -> Seq("code"),
-          "redirect_uri" -> Seq(callbackUrl)
+          "redirect_uri" -> Seq(config.callbackUrl)
         )
       )
     )
@@ -56,7 +52,7 @@ trait HelloUser extends Controller {
 
     (request.session.get("token"), request.session.get("refresh_token")) match {
       case (None, None) => redirectToOauthFrontEnd
-      case (Some(t), Some(rt)) => callOAuth map { case (json, token) => Ok(json).addToken(token) } recover {
+      case (Some(_), Some(_)) => callOAuth map { case (json, token) => Ok(json).addToken(token) } recover {
         case ex => InternalServerError(ex.getMessage)
       }
       case _ => Future.successful(InternalServerError("Token mismatch, both token and refresh token should be in the session"))
@@ -76,9 +72,4 @@ trait HelloUser extends Controller {
 
 }
 
-object HelloUser extends HelloUser {
-  override val clientId: String = ApplicationContext.clientId
-  override val callbackUrl: String = ApplicationContext.callbackUrl
-  override val authorizeUrl: String = ApplicationContext.authorizeUrl
-  override val service: HelloUserService = HelloUserService
-}
+case class HelloUserConfig(clientId: String, callbackUrl: String, authorizeUrl: String)

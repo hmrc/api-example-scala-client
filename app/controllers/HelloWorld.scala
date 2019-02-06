@@ -17,19 +17,15 @@
 package controllers
 
 import connectors.ApiConnector
+import javax.inject.Inject
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait HelloWorld extends Controller {
-  val apiConnector: ApiConnector
+class HelloWorld @Inject()(apiConnector: ApiConnector) extends Controller {
 
   def hello = Action.async {
     apiConnector.helloWorld() map (Ok(_))
   }
 
-}
-
-object HelloWorld extends HelloWorld {
-  override val apiConnector = ApiConnector
 }

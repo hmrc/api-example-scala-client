@@ -1,7 +1,7 @@
 # microservice specific routes
 
-GET        /                                controllers.Home.index
-GET        /hello-world                     controllers.HelloWorld.hello
-GET        /hello-application               controllers.HelloApplication.hello
-GET        /hello-user                      controllers.HelloUser.hello
-GET        /hello-world/oauth20/callback    controllers.HelloUser.helloWithCallback(code:Option[String], error:Option[String])
+GET        /                                @controllers.Home.index
+GET        /hello-world                     @controllers.HelloWorld.hello
+GET        /hello-application               @controllers.HelloApplication.hello
+GET        /hello-user                      @controllers.HelloUser.hello
+GET        /hello-world/oauth20/callback    @controllers.HelloUser.helloWithCallback(code:Option[String], error:Option[String])
