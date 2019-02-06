@@ -16,24 +16,22 @@
 
 package connectors
 
-import config.ApplicationContext
-import play.api.libs.json.JsValue
+import javax.inject.Inject
 import play.api.Play.current
 import play.api.http.HeaderNames
+import play.api.libs.json.JsValue
 import play.api.libs.ws.WS
 
 import scala.concurrent.Future
 
-trait ApiConnector {
-  val serviceUrl: String
-  val appToken: String
+class ApiConnector @Inject()(config: ApiConfig) {
   val versionHeader = "application/vnd.hmrc.1.0+json"
 
   def helloWorld(): Future[JsValue] = api("/hello/world")
 
   def helloUser(oauthToken: String): Future[JsValue] = api("/hello/user", Some(oauthToken))
 
-  def helloApplication(): Future[JsValue] = api("/hello/application", Some(appToken))
+  def helloApplication(): Future[JsValue] = api("/hello/application", Some(config.serverToken))
 
   private def api(endpoint: String, token: Option[String] = None): Future[JsValue] = {
     val authorizationHeader: Seq[(String, String)] = token match {
@@ -44,14 +42,11 @@ trait ApiConnector {
       HeaderNames.ACCEPT -> versionHeader
     )
 
-    val request = WS.url(s"$serviceUrl$endpoint").withHeaders(headers:_*)
+    val request = WS.url(s"${config.apiGateway}$endpoint").withHeaders(headers: _*)
 
     extractJson[JsValue](request.get())
   }
 
 }
 
-object ApiConnector extends ApiConnector {
-  override lazy val serviceUrl = ApplicationContext.apiGateway
-  override lazy val appToken: String = ApplicationContext.serverToken
-}
+case class ApiConfig(apiGateway: String, serverToken: String)

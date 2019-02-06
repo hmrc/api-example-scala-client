@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.ApplicationContext
+import javax.inject.Inject
 import play.api.Play.current
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WS
@@ -29,18 +29,11 @@ object OauthResponse {
   implicit val formats = Json.format[OauthResponse]
 }
 
-trait OAuth20Connector {
-
-  val serviceUrl: String
-  val clientId: String
-  val clientSecret: String
-  val authorizeUrl: String
-  val tokenUrl: String
-  val callbackUrl: String
+class OAuth20Connector @Inject()(config: OAuth20Config) {
 
   def getToken(authorisationCode: String): Future[OauthResponse] = oauth2(
     Map(
-      "redirect_uri" -> Seq(callbackUrl),
+      "redirect_uri" -> Seq(config.callbackUrl),
       "grant_type" -> Seq("authorization_code"),
       "code" -> Seq(authorisationCode)
     )
@@ -54,12 +47,12 @@ trait OAuth20Connector {
   )
 
   private def oauth2(body: Map[String, Seq[String]]): Future[OauthResponse] = {
-    val request = WS.url(tokenUrl)
+    val request = WS.url(config.tokenUrl)
 
     val response = request.post(
       Map(
-        "client_id" -> Seq(clientId),
-        "client_secret" -> Seq(clientSecret)
+        "client_id" -> Seq(config.clientId),
+        "client_secret" -> Seq(config.clientSecret)
       ) ++ body)
 
     extractJson[OauthResponse](response, { json: JsValue => json.validate[OauthResponse] })
@@ -67,11 +60,4 @@ trait OAuth20Connector {
 
 }
 
-object OAuth20Connector extends OAuth20Connector {
-  override val serviceUrl = ApplicationContext.oauth
-  override val clientId: String = ApplicationContext.clientId
-  override val clientSecret: String = ApplicationContext.clientSecret
-  override val authorizeUrl: String = ApplicationContext.authorizeUrl
-  override val tokenUrl: String = ApplicationContext.tokenUrl
-  override val callbackUrl: String = ApplicationContext.callbackUrl
-}
+case class OAuth20Config(clientId: String, clientSecret: String, tokenUrl: String, callbackUrl: String)

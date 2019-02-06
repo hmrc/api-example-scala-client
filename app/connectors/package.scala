@@ -18,6 +18,7 @@ import connectors.UnauthorizedException
 import play.Logger
 import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue}
 import play.api.libs.ws.WSResponse
+import play.api.http.Status._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -27,11 +28,11 @@ package object connectors {
     response.map {
       r => {
         r.status match {
-          case 200 => validation(r.json) match {
+          case OK => validation(r.json) match {
             case s: JsSuccess[T] => s.getOrElse(throw new RuntimeException("There is no token in the body"))
             case e: JsError => throw new RuntimeException(s"Failed to parse: ${r.body}")
           }
-          case 401 => throw new UnauthorizedException(r.body)
+          case UNAUTHORIZED => throw new UnauthorizedException(r.body)
           case _ =>
             Logger.error(s"WSResponse has status ${r.status}")
             throw new RuntimeException(r.body)
