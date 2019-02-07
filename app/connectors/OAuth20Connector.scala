@@ -17,11 +17,11 @@
 package connectors
 
 import javax.inject.Inject
-import play.api.Play.current
-import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.WS
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class OauthResponse(access_token: String, refresh_token: String, expires_in: Long)
 
@@ -29,9 +29,9 @@ object OauthResponse {
   implicit val formats = Json.format[OauthResponse]
 }
 
-class OAuth20Connector @Inject()(config: OAuth20Config) {
+class OAuth20Connector @Inject()(config: OAuth20Config, httpClient: HttpClient)(implicit ec: ExecutionContext) {
 
-  def getToken(authorisationCode: String): Future[OauthResponse] = oauth2(
+  def getToken(authorisationCode: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
       "redirect_uri" -> Seq(config.callbackUrl),
       "grant_type" -> Seq("authorization_code"),
@@ -39,23 +39,21 @@ class OAuth20Connector @Inject()(config: OAuth20Config) {
     )
   )
 
-  def refreshToken(refreshToken: String): Future[OauthResponse] = oauth2(
+  def refreshToken(refreshToken: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
       "grant_type" -> Seq("refresh_token"),
       "refresh_token" -> Seq(refreshToken)
     )
   )
 
-  private def oauth2(body: Map[String, Seq[String]]): Future[OauthResponse] = {
-    val request = WS.url(config.tokenUrl)
+  private def oauth2(body: Map[String, Seq[String]])(implicit hc: HeaderCarrier): Future[OauthResponse] = {
 
-    val response = request.post(
-      Map(
-        "client_id" -> Seq(config.clientId),
-        "client_secret" -> Seq(config.clientSecret)
-      ) ++ body)
+    val bodyWithClientData = Map(
+      "client_id" -> Seq(config.clientId),
+      "client_secret" -> Seq(config.clientSecret)
+    ) ++ body
 
-    extractJson[OauthResponse](response, { json: JsValue => json.validate[OauthResponse] })
+    httpClient.POST[Map[String, Seq[String]], OauthResponse](config.tokenUrl, bodyWithClientData)
   }
 
 }

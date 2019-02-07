@@ -22,7 +22,6 @@ lazy val microservice = (project in file("."))
     parallelExecution in Test := false,
     fork in Test := false,
     retrieveManaged := true,
-    routesGenerator := StaticRoutesGenerator,
     majorVersion := 0
   )
   .configs(IntegrationTest)
