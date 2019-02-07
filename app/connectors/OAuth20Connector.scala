@@ -33,27 +33,27 @@ class OAuth20Connector @Inject()(config: OAuth20Config, httpClient: HttpClient)(
 
   def getToken(authorisationCode: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
-      "redirect_uri" -> Seq(config.callbackUrl),
-      "grant_type" -> Seq("authorization_code"),
-      "code" -> Seq(authorisationCode)
+      "redirect_uri" -> config.callbackUrl,
+      "grant_type" -> "authorization_code",
+      "code" -> authorisationCode
     )
   )
 
   def refreshToken(refreshToken: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
-      "grant_type" -> Seq("refresh_token"),
-      "refresh_token" -> Seq(refreshToken)
+      "grant_type" -> "refresh_token",
+      "refresh_token" -> refreshToken
     )
   )
 
-  private def oauth2(body: Map[String, Seq[String]])(implicit hc: HeaderCarrier): Future[OauthResponse] = {
+  private def oauth2(body: Map[String, String])(implicit hc: HeaderCarrier): Future[OauthResponse] = {
 
     val bodyWithClientData = Map(
-      "client_id" -> Seq(config.clientId),
-      "client_secret" -> Seq(config.clientSecret)
+      "client_id" -> config.clientId,
+      "client_secret" -> config.clientSecret
     ) ++ body
 
-    httpClient.POST[Map[String, Seq[String]], OauthResponse](config.tokenUrl, bodyWithClientData)
+    httpClient.POST[Map[String, String], OauthResponse](config.tokenUrl, bodyWithClientData)
   }
 
 }

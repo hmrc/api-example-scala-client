@@ -19,7 +19,7 @@ package controllers
 import javax.inject.Inject
 import play.api.mvc._
 import services.{HelloUserService, OauthTokens}
-import uk.gov.hmrc.play.bootstrap.controller.{BaseController, FrontendController}
+import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
