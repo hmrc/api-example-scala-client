@@ -16,36 +16,30 @@
 
 package services
 
-import connectors.{UnauthorizedException, OAuth20Connector, ApiConnector}
+import connectors.{ApiConnector, OAuth20Connector, UnauthorizedException}
+import javax.inject.Inject
 import play.api.libs.json.JsValue
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 case class OauthTokens(access_token: String, refresh_token: String)
 
-trait HelloUserService {
+class HelloUserService @Inject()(apiConnector: ApiConnector,oauthConnector: OAuth20Connector) {
 
-  val apiConnector: ApiConnector
-  val oauthConnector: OAuth20Connector
-
-  def helloOauth(oAuthToken: String, refreshToken: String): Future[(JsValue, OauthTokens)] = {
+  def helloOauth(oAuthToken: String, refreshToken: String)(implicit hc: HeaderCarrier): Future[(JsValue, OauthTokens)] = {
     apiConnector.helloUser(oAuthToken).map((_, OauthTokens(oAuthToken,refreshToken))) recoverWith {
-      case e: UnauthorizedException =>
+      case _: UnauthorizedException =>
         oauthConnector.refreshToken(refreshToken) flatMap { t =>
           apiConnector.helloUser(t.access_token) map ((_, OauthTokens(t.access_token, t.refresh_token)))
         }
     }
   }
 
-  def helloOauth(authorizationCode: String): Future[(JsValue, OauthTokens)] = {
+  def helloOauth(authorizationCode: String)(implicit hc: HeaderCarrier): Future[(JsValue, OauthTokens)] = {
     oauthConnector.getToken(authorizationCode) flatMap { t =>
       apiConnector.helloUser(t.access_token) map ((_, OauthTokens(t.access_token, t.refresh_token)))
     }
   }
-}
-
-object HelloUserService extends HelloUserService {
-  override val apiConnector: ApiConnector = ApiConnector
-  override val oauthConnector = OAuth20Connector
 }

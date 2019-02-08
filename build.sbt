@@ -22,7 +22,6 @@ lazy val microservice = (project in file("."))
     parallelExecution in Test := false,
     fork in Test := false,
     retrieveManaged := true,
-    routesGenerator := StaticRoutesGenerator,
     majorVersion := 0
   )
   .configs(IntegrationTest)
@@ -49,15 +48,15 @@ lazy val appName = "api-example-scala-client"
 lazy val appDependencies: Seq[ModuleID] = allDeps
 
 val compile = Seq(
-  ws,
-  "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0"
+  "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0",
+  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.8.0"
 )
 
 val test = Seq(
   ws,
   "org.scalatest" %% "scalatest" % "2.2.6" % "test,it",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "test,it",
-  "org.mockito" % "mockito-core" % "1.10.19" % "test,it",
+  "org.mockito" % "mockito-core" % "2.10.0" % "test,it",
   "org.pegdown" % "pegdown" % "1.6.0" % "test,it"
 )
 lazy val allDeps = compile ++ test

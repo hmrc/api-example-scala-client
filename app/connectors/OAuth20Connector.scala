@@ -16,12 +16,12 @@
 
 package connectors
 
-import config.ApplicationContext
-import play.api.Play.current
-import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.WS
+import javax.inject.Inject
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class OauthResponse(access_token: String, refresh_token: String, expires_in: Long)
 
@@ -29,49 +29,33 @@ object OauthResponse {
   implicit val formats = Json.format[OauthResponse]
 }
 
-trait OAuth20Connector {
+class OAuth20Connector @Inject()(config: OAuth20Config, httpClient: HttpClient)(implicit ec: ExecutionContext) {
 
-  val serviceUrl: String
-  val clientId: String
-  val clientSecret: String
-  val authorizeUrl: String
-  val tokenUrl: String
-  val callbackUrl: String
-
-  def getToken(authorisationCode: String): Future[OauthResponse] = oauth2(
+  def getToken(authorisationCode: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
-      "redirect_uri" -> Seq(callbackUrl),
-      "grant_type" -> Seq("authorization_code"),
-      "code" -> Seq(authorisationCode)
+      "redirect_uri" -> config.callbackUrl,
+      "grant_type" -> "authorization_code",
+      "code" -> authorisationCode
     )
   )
 
-  def refreshToken(refreshToken: String): Future[OauthResponse] = oauth2(
+  def refreshToken(refreshToken: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
-      "grant_type" -> Seq("refresh_token"),
-      "refresh_token" -> Seq(refreshToken)
+      "grant_type" -> "refresh_token",
+      "refresh_token" -> refreshToken
     )
   )
 
-  private def oauth2(body: Map[String, Seq[String]]): Future[OauthResponse] = {
-    val request = WS.url(tokenUrl)
+  private def oauth2(body: Map[String, String])(implicit hc: HeaderCarrier): Future[OauthResponse] = {
 
-    val response = request.post(
-      Map(
-        "client_id" -> Seq(clientId),
-        "client_secret" -> Seq(clientSecret)
-      ) ++ body)
+    val bodyWithClientData = Map(
+      "client_id" -> config.clientId,
+      "client_secret" -> config.clientSecret
+    ) ++ body
 
-    extractJson[OauthResponse](response, { json: JsValue => json.validate[OauthResponse] })
+    httpClient.POST[Map[String, String], OauthResponse](config.tokenUrl, bodyWithClientData)
   }
 
 }
 
-object OAuth20Connector extends OAuth20Connector {
-  override val serviceUrl = ApplicationContext.oauth
-  override val clientId: String = ApplicationContext.clientId
-  override val clientSecret: String = ApplicationContext.clientSecret
-  override val authorizeUrl: String = ApplicationContext.authorizeUrl
-  override val tokenUrl: String = ApplicationContext.tokenUrl
-  override val callbackUrl: String = ApplicationContext.callbackUrl
-}
+case class OAuth20Config(clientId: String, clientSecret: String, tokenUrl: String, callbackUrl: String)
