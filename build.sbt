@@ -49,7 +49,7 @@ lazy val appDependencies: Seq[ModuleID] = allDeps
 
 val compile = Seq(
   "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0",
-  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.8.0"
+  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.11.0"
 )
 
 val test = Seq(
