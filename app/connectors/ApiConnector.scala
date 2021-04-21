@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,6 @@ class ApiConnector @Inject()(config: ApiConfig, httpClient: HttpClient)(implicit
   private def api(endpoint: String )(implicit hc: HeaderCarrier): Future[JsValue] = {
     httpClient.GET[JsValue](s"${config.apiGateway}$endpoint")
   }
-
 }
 
 case class ApiConfig(apiGateway: String, serverToken: String)

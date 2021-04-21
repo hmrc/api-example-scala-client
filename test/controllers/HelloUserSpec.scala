@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerTest, PlaySpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.{PlaySpec}
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
@@ -30,15 +30,18 @@ import services.{HelloUserService, OauthTokens}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
+import play.api.mvc.MessagesControllerComponents
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 
-class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with OneAppPerTest {
+class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with GuiceOneAppPerTest {
 
   implicit val hc = HeaderCarrier()
 
   trait Setup {
     val config = HelloUserConfig("CLIENT_ID", "http://helloworld.org", "http://authorizeurl.org")
     val mockHelloUserService = mock[HelloUserService]
-    val controller = new HelloUser(mockHelloUserService, config)
+    val mcc = app.injector.instanceOf[MessagesControllerComponents]
+    val controller = new HelloUser(mockHelloUserService, config, mcc)
   }
 
   "HelloUser callback" should {
