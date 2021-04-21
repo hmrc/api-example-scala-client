@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
 package controllers
 
 import connectors.ApiConnector
-import javax.inject.Inject
 import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import javax.inject.{Singleton, Inject}
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class HelloApplication @Inject()(apiConnector: ApiConnector) extends BaseController {
+@Singleton
+class HelloApplication @Inject()(apiConnector: ApiConnector, cc: ControllerComponents) extends BackendController(cc) {
 
   def hello = Action.async { implicit request =>
     apiConnector.helloApplication() map (Ok(_))
