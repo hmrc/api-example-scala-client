@@ -34,41 +34,36 @@ class ConfigurationModule extends Module {
 }
 
 object ConfigHelper {
-
-  def getConfig[T](key: String, f: String => Option[T]): T = {
-    f(key).getOrElse(throw new IllegalStateException(s"[$key] is not configured!"))
-  }
-
-  def callBackUrl(implicit runModeConfiguration: Configuration) = {
-    val callbackUrlBase = ConfigHelper.getConfig("callbackUrl", runModeConfiguration.getString(_))
+  def callBackUrl(implicit configuration: Configuration) = {
+    val callbackUrlBase = configuration.get[String]("callbackUrl")
     s"$callbackUrlBase/hello/hello-world/oauth20/callback"
   }
 
-  def oauthUrlBase(implicit runModeConfiguration: Configuration) = {
-    getConfig("services.oauth", runModeConfiguration.getString(_))
+  def oauthUrlBase(implicit configuration: Configuration) = {
+    configuration.get[String]("services.oauth")
   }
 
 }
 
 @Singleton
-class HelloUserConfigProvider @Inject()(implicit val runModeConfiguration: Configuration)
+class HelloUserConfigProvider @Inject()(implicit val configuration: Configuration)
   extends Provider[HelloUserConfig] {
 
   override def get() = {
-    val clientId = ConfigHelper.getConfig("clientId", runModeConfiguration.getString(_))
-    val callbackUrl = ConfigHelper.callBackUrl(runModeConfiguration)
+    val clientId = configuration.get[String]("clientId")
+    val callbackUrl = ConfigHelper.callBackUrl
     val authorizeUrl = s"${ConfigHelper.oauthUrlBase}/oauth/authorize"
     HelloUserConfig(clientId, callbackUrl, authorizeUrl)
   }
 }
 
 @Singleton
-class OAuth20ConfigProvider @Inject()(implicit val runModeConfiguration: Configuration)
+class OAuth20ConfigProvider @Inject()(implicit val configuration: Configuration)
   extends Provider[OAuth20Config] {
 
   override def get() = {
-    val clientId = ConfigHelper.getConfig("clientId", runModeConfiguration.getString(_))
-    val clientSecret = ConfigHelper.getConfig("clientSecret", runModeConfiguration.getString(_))
+    val clientId = configuration.get[String]("clientId")
+    val clientSecret = configuration.get[String]("clientSecret")
     val tokenUrl = s"${ConfigHelper.oauthUrlBase}/oauth/token"
     val callbackUrl = ConfigHelper.callBackUrl
     OAuth20Config(clientId, clientSecret, tokenUrl, callbackUrl)
@@ -76,12 +71,12 @@ class OAuth20ConfigProvider @Inject()(implicit val runModeConfiguration: Configu
 }
 
 @Singleton
-class ApiConfigProvider @Inject()(implicit val runModeConfiguration: Configuration)
+class ApiConfigProvider @Inject()(implicit val configuration: Configuration)
   extends Provider[ApiConfig] {
 
   override def get() = {
-    val apiGateway = ConfigHelper.getConfig("services.api-gateway", runModeConfiguration.getString(_))
-    val serverToken = ConfigHelper.getConfig("serverToken", runModeConfiguration.getString(_))
+    val apiGateway = configuration.get[String]("services.api-gateway")
+    val serverToken = configuration.get[String]("serverToken")
     ApiConfig(apiGateway, serverToken)
   }
 }

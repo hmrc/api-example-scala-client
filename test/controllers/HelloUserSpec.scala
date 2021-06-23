@@ -80,7 +80,6 @@ class HelloUserSpec extends PlaySpec with MustMatchers with ScalaFutures with Mo
 
     "return internal server eror when service fails" in new Setup {
       val authorizationCode = "11111111"
-      val token = OauthTokens("023456789", "9876543442")
       when(mockHelloUserService.helloOauth(meq(authorizationCode))(any())).thenReturn(
         Future.failed(new RuntimeException("exception"))
       )
