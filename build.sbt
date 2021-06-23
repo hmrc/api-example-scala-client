@@ -17,7 +17,7 @@ lazy val microservice = (project in file("."))
   .settings(defaultSettings(): _*)
   .settings(
     targetJvm := "jvm-1.8",
-    libraryDependencies ++= appDependencies,
+    libraryDependencies ++= AppDependencies(),
     parallelExecution in Test := false,
     fork in Test := false,
     retrieveManaged := true,
@@ -41,20 +41,6 @@ lazy val microservice = (project in file("."))
   .settings(scalaVersion := "2.12.12")
 
 lazy val appName = "api-example-scala-client"
-lazy val appDependencies: Seq[ModuleID] = allDeps
-
-val compile = Seq(
-  ws,
-  "uk.gov.hmrc"             %% "bootstrap-play-26"            % "4.0.0"
-)
-
-val test = Seq(
-  "org.scalatestplus.play"  %% "scalatestplus-play"           % "3.1.3"     % "test,it",
-  "org.mockito"             %% "mockito-scala-scalatest"      % "1.7.1"     % "test,it",
-  "org.pegdown"             %  "pegdown"                      % "1.6.0"     % "test,it"
-)
-
-lazy val allDeps = compile ++ test
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] =
   tests map { test =>
