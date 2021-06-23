@@ -27,18 +27,12 @@ lazy val microservice = (project in file("."))
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.testSettings): _*)
   .settings(
-    // Keys.fork in IntegrationTest := false,
     IntegrationTest / fork := false,
-    // unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest) (base => Seq(base / "it")),
     IntegrationTest / unmanagedSourceDirectories += baseDirectory.value / "it",
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    // IntegrationTest / testGrouping := (definedTests in IntegrationTest).value.map {
-    //   test => Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions = Vector(s"-Dtest.name=${test.name}")))
-    // },
     IntegrationTest / testGrouping := oneForkedJvmPerTest(
       (definedTests in IntegrationTest).value
     ),
-    // parallelExecution in IntegrationTest := false)
     IntegrationTest / parallelExecution := false
   )
   .settings(
@@ -52,7 +46,6 @@ lazy val appDependencies: Seq[ModuleID] = allDeps
 
 val compile = Seq(
   ws,
-  // "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0",
   "uk.gov.hmrc" %% "bootstrap-play-26" % "1.16.0"
 )
 
