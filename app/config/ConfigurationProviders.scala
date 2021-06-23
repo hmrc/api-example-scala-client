@@ -40,12 +40,12 @@ object ConfigHelper {
   }
 
   def callBackUrl(implicit runModeConfiguration: Configuration) = {
-    val callbackUrlBase = ConfigHelper.getConfig("callbackUrl", runModeConfiguration.getString(_))
+    val callbackUrlBase = ConfigHelper.getConfig("callbackUrl", runModeConfiguration.getOptional[String](_))
     s"$callbackUrlBase/hello/hello-world/oauth20/callback"
   }
 
   def oauthUrlBase(implicit runModeConfiguration: Configuration) = {
-    getConfig("services.oauth", runModeConfiguration.getString(_))
+    getConfig("services.oauth", runModeConfiguration.getOptional[String](_))
   }
 
 }
@@ -55,7 +55,7 @@ class HelloUserConfigProvider @Inject()(implicit val runModeConfiguration: Confi
   extends Provider[HelloUserConfig] {
 
   override def get() = {
-    val clientId = ConfigHelper.getConfig("clientId", runModeConfiguration.getString(_))
+    val clientId = ConfigHelper.getConfig("clientId", runModeConfiguration.getOptional[String](_))
     val callbackUrl = ConfigHelper.callBackUrl(runModeConfiguration)
     val authorizeUrl = s"${ConfigHelper.oauthUrlBase}/oauth/authorize"
     HelloUserConfig(clientId, callbackUrl, authorizeUrl)
@@ -67,8 +67,8 @@ class OAuth20ConfigProvider @Inject()(implicit val runModeConfiguration: Configu
   extends Provider[OAuth20Config] {
 
   override def get() = {
-    val clientId = ConfigHelper.getConfig("clientId", runModeConfiguration.getString(_))
-    val clientSecret = ConfigHelper.getConfig("clientSecret", runModeConfiguration.getString(_))
+    val clientId = ConfigHelper.getConfig("clientId", runModeConfiguration.getOptional[String](_))
+    val clientSecret = ConfigHelper.getConfig("clientSecret", runModeConfiguration.getOptional[String](_))
     val tokenUrl = s"${ConfigHelper.oauthUrlBase}/oauth/token"
     val callbackUrl = ConfigHelper.callBackUrl
     OAuth20Config(clientId, clientSecret, tokenUrl, callbackUrl)
@@ -80,8 +80,8 @@ class ApiConfigProvider @Inject()(implicit val runModeConfiguration: Configurati
   extends Provider[ApiConfig] {
 
   override def get() = {
-    val apiGateway = ConfigHelper.getConfig("services.api-gateway", runModeConfiguration.getString(_))
-    val serverToken = ConfigHelper.getConfig("serverToken", runModeConfiguration.getString(_))
+    val apiGateway = ConfigHelper.getConfig("services.api-gateway", runModeConfiguration.getOptional[String](_))
+    val serverToken = ConfigHelper.getConfig("serverToken", runModeConfiguration.getOptional[String](_))
     ApiConfig(apiGateway, serverToken)
   }
 }
