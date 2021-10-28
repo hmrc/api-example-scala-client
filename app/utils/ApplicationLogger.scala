@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package config
+package utils
 
-import javax.inject.Inject
-import play.api.Configuration
-import play.api.i18n.MessagesApi
-import play.api.mvc.Request
-import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
+import play.api.Logger
 
-class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration) extends FrontendErrorHandler {
-
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]) = {
-    views.html.global_error(pageTitle, heading, message)
-  }
+trait ApplicationLogger {
+  val logger = Logger("application")
 }

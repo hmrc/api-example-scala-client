@@ -19,13 +19,14 @@ package controllers
 import play.api.mvc._
 import services.{HelloUserService, OauthTokens}
 import javax.inject.{Singleton, Inject}
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 @Singleton
-class HelloUser @Inject()(service: HelloUserService, config: HelloUserConfig, cc: ControllerComponents) extends BackendController(cc) {
+class HelloUser @Inject()(service: HelloUserService, config: HelloUserConfig, cc: MessagesControllerComponents) extends FrontendController(cc) {
 
   implicit class RequestBuilder(result: Result)(implicit request: play.api.mvc.RequestHeader) {
     def addToken(oauthTokens: OauthTokens) =
