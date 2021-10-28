@@ -19,12 +19,10 @@ package controllers
 import connectors.ApiConnector
 import play.api.mvc._
 import javax.inject.{Singleton, Inject}
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
-
-import scala.concurrent.ExecutionContext.Implicits.global
-
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import scala.concurrent.ExecutionContext
 @Singleton
-class HelloWorld @Inject()(apiConnector: ApiConnector, cc: ControllerComponents) extends BackendController(cc) {
+class HelloWorld @Inject()(apiConnector: ApiConnector, cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   def hello = Action.async { implicit request =>
     apiConnector.helloWorld() map (Ok(_))

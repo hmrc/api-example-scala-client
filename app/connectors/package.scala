@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import play.Logger
 import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue}
 import play.api.libs.ws.WSResponse
 import play.api.http.Status._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
+import utils.ApplicationLogger
 
-package object connectors {
-  def extractJson[T](response: Future[WSResponse], validation: JsValue => JsResult[T] = returnSame): Future[T] = {
+package object connectors extends ApplicationLogger {
+  def extractJson[T](response: Future[WSResponse], validation: JsValue => JsResult[T] = returnSame)(implicit ec: ExecutionContext): Future[T] = {
     response.map {
       r => {
         r.status match {
@@ -33,14 +33,12 @@ package object connectors {
           }
           case UNAUTHORIZED => throw new UnauthorizedException(r.body)
           case _ =>
-            Logger.error(s"WSResponse has status ${r.status}")
+            logger.error(s"WSResponse has status ${r.status}")
             throw new RuntimeException(r.body)
         }
       }
     }
   }
 
-  def returnSame[T]: JsValue => JsResult[JsValue] =
-    j => j.validate[JsValue]
-
+  def returnSame[T]: JsValue => JsResult[JsValue] = j => j.validate[JsValue]
 }

@@ -17,17 +17,17 @@
 package services
 
 import connectors.{ApiConnector, OAuth20Connector, OauthResponse, UnauthorizedException}
-import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.concurrent.ScalaFutures
+import org.mockito.MockitoSugar
+import org.mockito.ArgumentMatchersSugar
 
-class HelloServiceSpec extends WordSpec with Matchers with ScalaFutures with MockitoSugar {
+class HelloServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with MockitoSugar with ArgumentMatchersSugar {
 
   implicit val hc = HeaderCarrier()
 
@@ -44,7 +44,7 @@ class HelloServiceSpec extends WordSpec with Matchers with ScalaFutures with Moc
       val tokens = OauthTokens("11111111111", "22222222222")
 
       when(mockOauthConnector.getToken(authorizationCode)).thenReturn(Future.successful(oauthResponse))
-      when(mockApiConnector.helloUser(meq(oauthResponse.access_token))(any())).thenReturn(Future.successful(Json.parse( """{"message":"hello User"}""")))
+      when(mockApiConnector.helloUser(eqTo(oauthResponse.access_token))(*)).thenReturn(Future.successful(Json.parse( """{"message":"hello User"}""")))
       val (jv, t) = service.helloOauth(authorizationCode).futureValue
 
       jv shouldBe Json.parse( """{"message":"hello User"}""")
