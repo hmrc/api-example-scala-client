@@ -26,7 +26,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.concurrent.ScalaFutures
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchersSugar
-
+import scala.concurrent.ExecutionContext.Implicits.global
 class HelloServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with MockitoSugar with ArgumentMatchersSugar {
 
   implicit val hc = HeaderCarrier()

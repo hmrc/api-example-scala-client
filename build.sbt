@@ -34,9 +34,7 @@ lazy val microservice = (project in file("."))
     ),
     IntegrationTest / parallelExecution := false
   )
-  .settings(
-      resolvers += "hmrc-releases" at "https://artefacts.tax.service.gov.uk/artifactory/hmrc-releases/"
-  )
+
   .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
   .settings(scalaVersion := "2.12.12")
 
