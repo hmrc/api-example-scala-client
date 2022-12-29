@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.mockito.ArgumentMatchersSugar
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class HelloUserSpec extends PlaySpec with Matchers with ScalaFutures with MockitoSugar with ArgumentMatchersSugar with GuiceOneAppPerTest {
 

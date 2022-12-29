@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@
 package services
 
 import connectors.{ApiConnector, OAuth20Connector, UnauthorizedException}
+
 import javax.inject.Inject
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class OauthTokens(access_token: String, refresh_token: String)
 
-class HelloUserService @Inject()(apiConnector: ApiConnector,oauthConnector: OAuth20Connector) {
+class HelloUserService @Inject()(apiConnector: ApiConnector,oauthConnector: OAuth20Connector)(implicit ec: ExecutionContext) {
 
   def helloOauth(oAuthToken: String, refreshToken: String)(implicit hc: HeaderCarrier): Future[(JsValue, OauthTokens)] = {
     apiConnector.helloUser(oAuthToken).map((_, OauthTokens(oAuthToken,refreshToken))) recoverWith {
