@@ -1,5 +1,5 @@
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings, targetJvm}
+import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 lazy val plugins: Seq[Plugins] = Seq(SbtAutoBuildPlugin, SbtDistributablesPlugin)
@@ -16,10 +16,9 @@ lazy val microservice = (project in file("."))
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(
-    targetJvm := "jvm-1.8",
     libraryDependencies ++= AppDependencies(),
-    parallelExecution in Test := false,
-    fork in Test := false,
+    Test / parallelExecution := false,
+    Test / fork := false,
     retrieveManaged := true,
     majorVersion := 0
   )
@@ -30,7 +29,7 @@ lazy val microservice = (project in file("."))
     IntegrationTest / unmanagedSourceDirectories += baseDirectory.value / "it",
     addTestReportOption(IntegrationTest, "int-test-reports"),
     IntegrationTest / testGrouping := oneForkedJvmPerTest(
-      (definedTests in IntegrationTest).value
+      (IntegrationTest / definedTests).value
     ),
     IntegrationTest / parallelExecution := false
   )
