@@ -6,6 +6,16 @@ lazy val plugins: Seq[Plugins] = Seq(SbtAutoBuildPlugin, SbtDistributablesPlugin
 
 lazy val playSettings: Seq[Setting[_]] = Seq.empty
 
+ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
+
+inThisBuild(
+  List(
+    scalaVersion := "2.12.12",
+    semanticdbEnabled := true,
+    semanticdbVersion := scalafixSemanticdb.revision
+  )
+)
+
 lazy val microservice = (project in file("."))
   .enablePlugins(Seq(play.sbt.PlayScala) ++ plugins: _*)
   .settings(
