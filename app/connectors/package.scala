@@ -23,20 +23,22 @@ import scala.concurrent.ExecutionContext
 import utils.ApplicationLogger
 
 package object connectors extends ApplicationLogger {
+
   def extractJson[T](response: Future[WSResponse], validation: JsValue => JsResult[T] = returnSame)(implicit ec: ExecutionContext): Future[T] = {
     response.map {
-      r => {
-        r.status match {
-          case OK => validation(r.json) match {
-            case s: JsSuccess[T] => s.getOrElse(throw new RuntimeException("There is no token in the body"))
-            case e: JsError => throw new RuntimeException(s"Failed to parse: ${r.body}")
+      r =>
+        {
+          r.status match {
+            case OK           => validation(r.json) match {
+                case s: JsSuccess[T] => s.getOrElse(throw new RuntimeException("There is no token in the body"))
+                case e: JsError      => throw new RuntimeException(s"Failed to parse: ${r.body}")
+              }
+            case UNAUTHORIZED => throw new UnauthorizedException(r.body)
+            case _            =>
+              logger.error(s"WSResponse has status ${r.status}")
+              throw new RuntimeException(r.body)
           }
-          case UNAUTHORIZED => throw new UnauthorizedException(r.body)
-          case _ =>
-            logger.error(s"WSResponse has status ${r.status}")
-            throw new RuntimeException(r.body)
         }
-      }
     }
   }
 

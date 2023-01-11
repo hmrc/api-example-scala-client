@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApiConnector @Inject()(config: ApiConfig, httpClient: HttpClient)(implicit ex: ExecutionContext) {
+class ApiConnector @Inject() (config: ApiConfig, httpClient: HttpClient)(implicit ex: ExecutionContext) {
   val versionHeader = "application/vnd.hmrc.1.0+json"
 
   def helloWorld()(implicit hc: HeaderCarrier): Future[JsValue] = {
@@ -40,18 +40,18 @@ class ApiConnector @Inject()(config: ApiConfig, httpClient: HttpClient)(implicit
     api("/hello/application")(buildHeaderCarrier(Some(config.serverToken)))
   }
 
-  private def buildHeaderCarrier(token: Option[String] = None)(implicit hc: HeaderCarrier) : HeaderCarrier = {
+  private def buildHeaderCarrier(token: Option[String] = None)(implicit hc: HeaderCarrier): HeaderCarrier = {
     val authorizationHeader: Seq[(String, String)] = token match {
       case Some(t) => Seq(HeaderNames.AUTHORIZATION -> s"Bearer $t")
-      case None => Seq()
+      case None    => Seq()
     }
-    val headers = authorizationHeader ++ Seq(
+    val headers                                    = authorizationHeader ++ Seq(
       HeaderNames.ACCEPT -> versionHeader
     )
     hc.withExtraHeaders(headers: _*)
   }
 
-  private def api(endpoint: String )(implicit hc: HeaderCarrier): Future[JsValue] = {
+  private def api(endpoint: String)(implicit hc: HeaderCarrier): Future[JsValue] = {
     httpClient.GET[JsValue](s"${config.apiGateway}$endpoint")
   }
 }

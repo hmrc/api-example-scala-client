@@ -30,19 +30,19 @@ object OauthResponse {
   implicit val formats = Json.format[OauthResponse]
 }
 
-class OAuth20Connector @Inject()(config: OAuth20Config, httpClient: HttpClient)(implicit ec: ExecutionContext) {
+class OAuth20Connector @Inject() (config: OAuth20Config, httpClient: HttpClient)(implicit ec: ExecutionContext) {
 
   def getToken(authorisationCode: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
       "redirect_uri" -> config.callbackUrl,
-      "grant_type" -> "authorization_code",
-      "code" -> authorisationCode
+      "grant_type"   -> "authorization_code",
+      "code"         -> authorisationCode
     )
   )
 
   def refreshToken(refreshToken: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
-      "grant_type" -> "refresh_token",
+      "grant_type"    -> "refresh_token",
       "refresh_token" -> refreshToken
     )
   )
@@ -50,7 +50,7 @@ class OAuth20Connector @Inject()(config: OAuth20Config, httpClient: HttpClient)(
   private def oauth2(body: Map[String, String])(implicit hc: HeaderCarrier): Future[OauthResponse] = {
 
     val bodyWithClientData = Map(
-      "client_id" -> config.clientId,
+      "client_id"     -> config.clientId,
       "client_secret" -> config.clientSecret
     ) ++ body
 
