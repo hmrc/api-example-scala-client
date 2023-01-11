@@ -16,11 +16,13 @@
 
 package config
 
-import connectors.{ApiConfig, OAuth20Config}
-import controllers.HelloUserConfig
 import javax.inject.{Inject, Provider, Singleton}
+
 import play.api.inject.{Binding, Module}
 import play.api.{Configuration, Environment}
+
+import connectors.{ApiConfig, OAuth20Config}
+import controllers.HelloUserConfig
 
 class ConfigurationModule extends Module {
 

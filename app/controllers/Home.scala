@@ -17,8 +17,9 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 @Singleton
 class Home @Inject() (mcc: MessagesControllerComponents) extends FrontendController(mcc) {

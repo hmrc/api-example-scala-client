@@ -17,6 +17,7 @@
 package config
 
 import javax.inject.Inject
+
 import play.api.Configuration
 import play.api.i18n.MessagesApi
 import play.api.mvc.Request

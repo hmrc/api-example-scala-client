@@ -17,12 +17,11 @@
 package connectors
 
 import javax.inject.Inject
-import play.api.libs.json.Json
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http.HttpReads.Implicits._
-
 import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 case class OauthResponse(access_token: String, refresh_token: String, expires_in: Long)
 

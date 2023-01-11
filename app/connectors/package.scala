@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.http.Status._
 import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue}
 import play.api.libs.ws.WSResponse
-import play.api.http.Status._
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
 import utils.ApplicationLogger
 
 package object connectors extends ApplicationLogger {

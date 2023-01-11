@@ -17,13 +17,12 @@
 package connectors
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
 import play.api.http.HeaderNames
 import play.api.libs.json.JsValue
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
-
-import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 class ApiConnector @Inject() (config: ApiConfig, httpClient: HttpClient)(implicit ex: ExecutionContext) {
   val versionHeader = "application/vnd.hmrc.1.0+json"

@@ -16,22 +16,22 @@
 
 package controllers
 
-import play.api.libs.json.Json
-import play.api.mvc.Result
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import services.{HelloUserService, OauthTokens}
-import uk.gov.hmrc.http.HeaderCarrier
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import play.api.mvc.MessagesControllerComponents
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import org.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
-import org.mockito.ArgumentMatchersSugar
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
+
+import play.api.libs.json.Json
+import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
+
+import services.{HelloUserService, OauthTokens}
 
 class HelloUserSpec extends PlaySpec with Matchers with ScalaFutures with MockitoSugar with ArgumentMatchersSugar with GuiceOneAppPerTest {
 

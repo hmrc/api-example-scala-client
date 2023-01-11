@@ -16,13 +16,13 @@
 
 package services
 
-import connectors.{ApiConnector, OAuth20Connector, UnauthorizedException}
-
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import connectors.{ApiConnector, OAuth20Connector, UnauthorizedException}
 
 case class OauthTokens(access_token: String, refresh_token: String)
 

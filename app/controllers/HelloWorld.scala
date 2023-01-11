@@ -16,11 +16,13 @@
 
 package controllers
 
-import connectors.ApiConnector
-import play.api.mvc._
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.ExecutionContext
+
+import play.api.mvc._
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+
+import connectors.ApiConnector
 
 @Singleton
 class HelloWorld @Inject() (apiConnector: ApiConnector, cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {

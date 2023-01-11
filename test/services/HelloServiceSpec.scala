@@ -16,17 +16,18 @@
 
 package services
 
-import connectors.{ApiConnector, OAuth20Connector, OauthResponse, UnauthorizedException}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.concurrent.ScalaFutures
-import org.mockito.MockitoSugar
-import org.mockito.ArgumentMatchersSugar
-import scala.concurrent.ExecutionContext.Implicits.global
+import connectors.{ApiConnector, OAuth20Connector, OauthResponse, UnauthorizedException}
 
 class HelloServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with MockitoSugar with ArgumentMatchersSugar {
 

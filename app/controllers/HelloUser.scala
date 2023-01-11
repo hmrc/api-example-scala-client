@@ -16,14 +16,13 @@
 
 package controllers
 
-import play.api.mvc._
-import services.{HelloUserService, OauthTokens}
-
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import services.{HelloUserService, OauthTokens}
 
 @Singleton
 class HelloUser @Inject() (service: HelloUserService, config: HelloUserConfig, cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
