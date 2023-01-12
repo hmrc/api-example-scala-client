@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package config
 
-import connectors.{ApiConfig, OAuth20Config}
-import controllers.HelloUserConfig
 import javax.inject.{Inject, Provider, Singleton}
+
 import play.api.inject.{Binding, Module}
 import play.api.{Configuration, Environment}
+
+import connectors.{ApiConfig, OAuth20Config}
+import controllers.HelloUserConfig
 
 class ConfigurationModule extends Module {
 
@@ -34,6 +36,7 @@ class ConfigurationModule extends Module {
 }
 
 object ConfigHelper {
+
   def callBackUrl(implicit configuration: Configuration) = {
     val callbackUrlBase = configuration.get[String]("callbackUrl")
     s"$callbackUrlBase/hello/hello-world/oauth20/callback"
@@ -46,39 +49,37 @@ object ConfigHelper {
 }
 
 @Singleton
-class HelloUserConfigProvider @Inject()(implicit val configuration: Configuration)
-  extends Provider[HelloUserConfig] {
+class HelloUserConfigProvider @Inject() (implicit val configuration: Configuration)
+    extends Provider[HelloUserConfig] {
 
   override def get() = {
-    val clientId = configuration.get[String]("clientId")
-    val callbackUrl = ConfigHelper.callBackUrl
+    val clientId     = configuration.get[String]("clientId")
+    val callbackUrl  = ConfigHelper.callBackUrl
     val authorizeUrl = s"${ConfigHelper.oauthUrlBase}/oauth/authorize"
     HelloUserConfig(clientId, callbackUrl, authorizeUrl)
   }
 }
 
 @Singleton
-class OAuth20ConfigProvider @Inject()(implicit val configuration: Configuration)
-  extends Provider[OAuth20Config] {
+class OAuth20ConfigProvider @Inject() (implicit val configuration: Configuration)
+    extends Provider[OAuth20Config] {
 
   override def get() = {
-    val clientId = configuration.get[String]("clientId")
+    val clientId     = configuration.get[String]("clientId")
     val clientSecret = configuration.get[String]("clientSecret")
-    val tokenUrl = s"${ConfigHelper.oauthUrlBase}/oauth/token"
-    val callbackUrl = ConfigHelper.callBackUrl
+    val tokenUrl     = s"${ConfigHelper.oauthUrlBase}/oauth/token"
+    val callbackUrl  = ConfigHelper.callBackUrl
     OAuth20Config(clientId, clientSecret, tokenUrl, callbackUrl)
   }
 }
 
 @Singleton
-class ApiConfigProvider @Inject()(implicit val configuration: Configuration)
-  extends Provider[ApiConfig] {
+class ApiConfigProvider @Inject() (implicit val configuration: Configuration)
+    extends Provider[ApiConfig] {
 
   override def get() = {
-    val apiGateway = configuration.get[String]("services.api-gateway")
+    val apiGateway  = configuration.get[String]("services.api-gateway")
     val serverToken = configuration.get[String]("serverToken")
     ApiConfig(apiGateway, serverToken)
   }
 }
-
-

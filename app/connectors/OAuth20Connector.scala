@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 package connectors
 
 import javax.inject.Inject
-import play.api.libs.json.Json
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http.HttpReads.Implicits._
-
 import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 case class OauthResponse(access_token: String, refresh_token: String, expires_in: Long)
 
@@ -30,19 +29,19 @@ object OauthResponse {
   implicit val formats = Json.format[OauthResponse]
 }
 
-class OAuth20Connector @Inject()(config: OAuth20Config, httpClient: HttpClient)(implicit ec: ExecutionContext) {
+class OAuth20Connector @Inject() (config: OAuth20Config, httpClient: HttpClient)(implicit ec: ExecutionContext) {
 
   def getToken(authorisationCode: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
       "redirect_uri" -> config.callbackUrl,
-      "grant_type" -> "authorization_code",
-      "code" -> authorisationCode
+      "grant_type"   -> "authorization_code",
+      "code"         -> authorisationCode
     )
   )
 
   def refreshToken(refreshToken: String)(implicit hc: HeaderCarrier): Future[OauthResponse] = oauth2(
     Map(
-      "grant_type" -> "refresh_token",
+      "grant_type"    -> "refresh_token",
       "refresh_token" -> refreshToken
     )
   )
@@ -50,7 +49,7 @@ class OAuth20Connector @Inject()(config: OAuth20Config, httpClient: HttpClient)(
   private def oauth2(body: Map[String, String])(implicit hc: HeaderCarrier): Future[OauthResponse] = {
 
     val bodyWithClientData = Map(
-      "client_id" -> config.clientId,
+      "client_id"     -> config.clientId,
       "client_secret" -> config.clientSecret
     ) ++ body
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
+import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.http.Status._
 import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue}
 import play.api.libs.ws.WSResponse
-import play.api.http.Status._
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
 import utils.ApplicationLogger
 
 package object connectors extends ApplicationLogger {
+
   def extractJson[T](response: Future[WSResponse], validation: JsValue => JsResult[T] = returnSame)(implicit ec: ExecutionContext): Future[T] = {
     response.map {
-      r => {
-        r.status match {
-          case OK => validation(r.json) match {
-            case s: JsSuccess[T] => s.getOrElse(throw new RuntimeException("There is no token in the body"))
-            case e: JsError => throw new RuntimeException(s"Failed to parse: ${r.body}")
+      r =>
+        {
+          r.status match {
+            case OK           => validation(r.json) match {
+                case s: JsSuccess[T] => s.getOrElse(throw new RuntimeException("There is no token in the body"))
+                case e: JsError      => throw new RuntimeException(s"Failed to parse: ${r.body}")
+              }
+            case UNAUTHORIZED => throw new UnauthorizedException(r.body)
+            case _            =>
+              logger.error(s"WSResponse has status ${r.status}")
+              throw new RuntimeException(r.body)
           }
-          case UNAUTHORIZED => throw new UnauthorizedException(r.body)
-          case _ =>
-            logger.error(s"WSResponse has status ${r.status}")
-            throw new RuntimeException(r.body)
         }
-      }
     }
   }
 

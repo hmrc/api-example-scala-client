@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 
 package controllers
 
-import connectors.ApiConnector
-import play.api.mvc._
-import javax.inject.{Singleton, Inject}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
+
+import play.api.mvc._
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+
+import connectors.ApiConnector
+
 @Singleton
-class HelloWorld @Inject()(apiConnector: ApiConnector, cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
+class HelloWorld @Inject() (apiConnector: ApiConnector, cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   def hello = Action.async { implicit request =>
     apiConnector.helloWorld() map (Ok(_))

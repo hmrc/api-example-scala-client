@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package controllers
 
-import javax.inject.{Singleton, Inject}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import javax.inject.{Inject, Singleton}
+
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 @Singleton
-class Home @Inject()(mcc: MessagesControllerComponents) extends FrontendController(mcc) {
+class Home @Inject() (mcc: MessagesControllerComponents) extends FrontendController(mcc) {
+
   def index() = Action {
     Ok(views.html.index())
   }
